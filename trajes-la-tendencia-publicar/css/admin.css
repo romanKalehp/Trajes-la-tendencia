@@ -171,6 +171,11 @@ code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.92em;
 .side-store:hover,.side-logout:hover{background:rgba(255,255,255,.06);color:#fff}
 .side-logout{color:rgba(255,180,180,.8)}
 .sidebar__foot p{font-size:8.5px;color:rgba(234,217,223,.32);text-align:center;margin-top:12px;letter-spacing:.05em}
+.cloud-status{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px!important}
+.cloud-status::before{content:"";width:6px;height:6px;border-radius:50%;background:rgba(234,217,223,.35);flex:none}
+.cloud-status[data-state="ok"]::before{background:#5BBF7A}
+.cloud-status[data-state="saving"]::before{background:#E0B84C}
+.cloud-status[data-state="error"]::before{background:#E0607A}
 .sidebar-overlay{display:none}
 
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
