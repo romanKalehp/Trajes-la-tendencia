@@ -132,6 +132,7 @@
         <svg class="ico"><use href="#a-logout"/></svg> Cerrar sesión
       </button>
       <p>Trajes La Tendencia · v1.0</p>
+      <p class="cloud-status" id="cloud-status" data-state="off">Nube: no configurada</p>
     </div>
   </aside>
 
@@ -390,9 +391,9 @@
           <div class="publish__icon"><svg class="ico"><use href="#a-upload"/></svg></div>
           <div>
             <h3>¿Cómo publico mis cambios?</h3>
-            <p>El panel guarda los cambios en este navegador. Para que los vea todo el mundo, exporta el catálogo y reemplaza el archivo <code>js/data.js</code> en tu hosting. Las fotos nuevas viajan dentro de ese archivo, sin servicios externos.</p>
+            <p id="publish-text">El panel guarda los cambios en este navegador. Para que los vea todo el mundo, exporta el catálogo y reemplaza el archivo <code>js/data.js</code> en tu hosting. Las fotos nuevas viajan dentro de ese archivo, sin servicios externos.</p>
           </div>
-          <ol>
+          <ol id="publish-steps">
             <li><span>1</span> Edita productos y ajustes.</li>
             <li><span>2</span> Presiona <b>Exportar catálogo publicado</b>.</li>
             <li><span>3</span> Sube el nuevo <code>data.js</code> a <code>js/</code>.</li>
@@ -504,6 +505,40 @@
 <button class="fab" id="btn-fab-new" aria-label="Nuevo producto"><svg class="ico"><use href="#a-plus"/></svg></button>
 
 <script src="js/data.js"></script>
-<script src="js/admin.js"></script>
+<script src="js/cloud.js"></script>
+<script>
+(function () {
+  var CACHE = "lt_catalog_v1";
+  var REV = "lt_cloud_rev";
+  function boot() {
+    var s = document.createElement("script");
+    s.src = "js/admin.js";
+    document.body.appendChild(s);
+  }
+  if (!window.LTCloud || !window.LTCloud.ready()) { boot(); return; }
+  var started = false;
+  function start() { if (started) return; started = true; boot(); }
+  function localRev() { try { return localStorage.getItem(REV); } catch (e) { return null; } }
+  function hasCache() { try { return !!localStorage.getItem(CACHE); } catch (e) { return false; } }
+  function save(data, rev) {
+    data.revision = Date.now();
+    try {
+      localStorage.setItem(CACHE, JSON.stringify(data));
+      if (rev) localStorage.setItem(REV, rev);
+    } catch (e) {}
+  }
+  window.LTCloud.version().then(function (rev) {
+    if (rev && localRev() === rev && hasCache()) { start(); return; }
+    return window.LTCloud.load().then(function (data) {
+      if (data && Array.isArray(data.products)) save(data, rev);
+      start();
+    });
+  }).catch(function (err) {
+    console.warn("No se pudo cargar el catálogo de la nube:", err);
+    start();
+  });
+  setTimeout(start, 5000);
+})();
+</script>
 </body>
 </html>
