@@ -24,11 +24,11 @@ Incluye tienda pública, carrito, checkout, pedido por WhatsApp y un **panel de 
 |---|---|
 | Tienda | `http://localhost:5178/` |
 | Panel de administración | `http://localhost:5178/admin.html` |
-| Clave inicial del panel | `LT2026` |
+| Clave del panel | privada (no se publica en el sitio) |
 | WhatsApp del taller | `50233451029` (visible: 3345 1029) |
 | Facebook | https://www.facebook.com/trajes.la.tendencia |
 
-Cambia la clave inicial en **Ajustes → Seguridad** antes de publicar el sitio.
+La clave del panel es privada: no está escrita en el sitio, solo su huella cifrada. Puedes cambiarla en **Ajustes → Seguridad**.
 
 ---
 
@@ -88,7 +88,7 @@ La tarjeta **no cobra dinero real**. Es una simulación para mostrar el flujo; l
 ### Entrar
 
 1. Abre `/admin.html`.
-2. Escribe la clave (inicial: `LT2026`).
+2. Escribe tu clave maestra (la que se te entregó al configurar el sitio).
 3. La sesión dura mientras la pestaña esté abierta. Al cerrar la pestaña o presionar **Cerrar sesión**, se pide la clave otra vez.
 
 ### Resumen
@@ -120,14 +120,7 @@ Muestra productos activos, pedidos guardados en ese navegador, ingresos confirma
 
 ### Si olvidas la clave
 
-La clave se guarda como una huella SHA-256 en el navegador. Si la olvidas, abre la consola de desarrollador en `/admin.html` y ejecuta:
-
-```js
-localStorage.removeItem("lt_admin_hash_v1");
-location.reload();
-```
-
-La clave vuelve a ser `LT2026`. Esto **no borra** productos ni pedidos. Cámbiala de nuevo enseguida.
+La clave no se guarda en el sitio: solo su huella. Si la olvidas, pide que la restablezcan: hay que generar una nueva huella en `js/admin.js` y en la tabla privada `site_auth` de Supabase. **No borres los datos del navegador**: eso no cambia la clave de la nube y perderías el catálogo local.
 
 ---
 
@@ -145,7 +138,7 @@ Con Supabase, los cambios del panel se publican solos y los ven todos los dispos
 4. Pégalos en `js/cloud.js`, dentro de `window.LT_CLOUD`.
 5. Vuelve a desplegar el sitio una sola vez.
 
-Desde entonces el panel muestra **Nube: conectada** y cada cambio se guarda en la nube. La clave de escritura es la misma del panel (`LT2026` por defecto); si la cambias, actualiza el hash en `supabase/schema.sql`.
+Desde entonces el panel muestra **Nube: conectada** y cada cambio se guarda en la nube. La clave de escritura es la misma del panel: se guarda como huella en la tabla privada `site_auth` y se puede cambiar desde **Ajustes → Seguridad** (se sincroniza sola con Supabase).
 
 ### Opción B · Exportar y subir (sin nube)
 
@@ -172,7 +165,7 @@ Conviene usar **HTTPS** (todos los hostings anteriores lo dan gratis). WhatsApp,
 
 `admin.html` es un archivo público: cualquiera que conozca la URL puede ver la pantalla de acceso. La clave es una barrera del lado del navegador, no autenticación de servidor. Para protegerlo mejor:
 
-- Usa una clave larga y única (no `LT2026`).
+- Usa una clave larga y única (nada de palabras obvias ni la misma clave del correo).
 - No enlaces el panel desde la tienda (ya no está enlazado).
 - En cPanel, usa **Directory Privacy** para proteger `admin.html` con usuario y contraseña del servidor.
 - Si tu hosting lo permite, bloquea `/admin.html` por IP o con una regla de acceso.
