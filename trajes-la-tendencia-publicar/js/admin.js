@@ -19,7 +19,8 @@
     catalog: "lt_catalog_v1",
     orders: "lt_orders_v1",
     hash: "lt_admin_hash_v1",
-    session: "lt_admin_session_v1"
+    session: "lt_admin_session_v1",
+    cloudPass: "lt_cloud_pass_v1"
   };
   const DEFAULT_PASS = "LT2026";
   const BASE = window.LT_DATA;
@@ -34,10 +35,25 @@
   };
 
   let memorySession = false;
+  let memoryPass = "";
   const session = {
     get() { try { return sessionStorage.getItem(KEYS.session) === "ok"; } catch (e) { return memorySession; } },
     set(v) { try { sessionStorage.setItem(KEYS.session, v ? "ok" : "no"); } catch (e) { memorySession = v; } },
-    clear() { try { sessionStorage.removeItem(KEYS.session); } catch (e) {} memorySession = false; }
+    clear() {
+      try { sessionStorage.removeItem(KEYS.session); } catch (e) {}
+      memorySession = false;
+      this.setPass("");
+    },
+    getPass() {
+      try { return sessionStorage.getItem(KEYS.cloudPass) || memoryPass; } catch (e) { return memoryPass; }
+    },
+    setPass(p) {
+      memoryPass = p || "";
+      try {
+        if (p) sessionStorage.setItem(KEYS.cloudPass, p);
+        else sessionStorage.removeItem(KEYS.cloudPass);
+      } catch (e) {}
+    }
   };
 
   let catalog = loadCatalog();
@@ -64,8 +80,50 @@
   }
 
   function saveCatalog() {
-    try { localStorage.setItem(KEYS.catalog, JSON.stringify(catalog)); return true; }
+    try { localStorage.setItem(KEYS.catalog, JSON.stringify(catalog)); }
     catch (e) { return false; }
+    pushCloud();
+    return true;
+  }
+
+  /* ---------- Nube (Supabase) ---------- */
+  let cloudTimer = null;
+
+  function cloudLabel(state, detail) {
+    const el = $("#cloud-status");
+    if (!el) return;
+    const labels = {
+      off: "Nube: no configurada",
+      ok: "Nube: conectada",
+      saving: "Nube: publicando…",
+      error: "Nube: error"
+    };
+    el.dataset.state = state;
+    el.textContent = labels[state] || labels.off;
+    el.title = detail || "";
+  }
+
+  function pushCloud() {
+    if (!window.LTCloud || !window.LTCloud.ready()) { cloudLabel("off"); return; }
+    const pass = session.getPass();
+    if (!pass) {
+      cloudLabel("error", "Vuelve a iniciar sesión para publicar en la nube.");
+      return;
+    }
+    clearTimeout(cloudTimer);
+    cloudLabel("saving");
+    cloudTimer = setTimeout(async () => {
+      try {
+        const res = await window.LTCloud.save(catalog, pass);
+        if (res && res.updated_at) {
+          try { localStorage.setItem("lt_cloud_rev", res.updated_at); } catch (e) {}
+        }
+        cloudLabel("ok");
+      } catch (err) {
+        cloudLabel("error", err.message);
+        toast("No se pudo publicar en la nube: " + err.message);
+      }
+    }, 600);
   }
 
   function getOrders() {
@@ -137,6 +195,7 @@
           return;
         }
         session.set(true);
+        session.setPass(value);
         showApp();
       } finally {
         btn.disabled = false;
@@ -976,6 +1035,13 @@
     bind();
     // Asegura la clave inicial en segundo plano.
     storedHash().catch(() => {});
+    cloudLabel(window.LTCloud && window.LTCloud.ready() ? "ok" : "off");
+    if (window.LTCloud && window.LTCloud.ready()) {
+      const pt = $("#publish-text");
+      if (pt) pt.textContent = "Modo nube activo: cada cambio que guardes se publica en internet y lo ven todos los dispositivos al recargar. La exportación queda solo como respaldo.";
+      const ps = $("#publish-steps");
+      if (ps) ps.hidden = true;
+    }
     if (session.get()) showApp();
     else showLogin();
   }
