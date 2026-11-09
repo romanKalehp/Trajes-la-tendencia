@@ -18,11 +18,13 @@
   const KEYS = {
     catalog: "lt_catalog_v1",
     orders: "lt_orders_v1",
-    hash: "lt_admin_hash_v1",
-    session: "lt_admin_session_v1",
+    hash: "lt_admin_hash_v2",
+    session: "lt_admin_session_v2",
     cloudPass: "lt_cloud_pass_v1"
   };
-  const DEFAULT_PASS = "LT2026";
+  // Huella SHA-256 de la clave maestra del taller.
+  // Nunca se guarda la clave en texto plano dentro del sitio.
+  const DEFAULT_HASH = "8056b5d9c9ce1eb09b7348b6268679de48b86e634772d5eb68b9819c6d5b3ab1";
   const BASE = window.LT_DATA;
 
   const STATUS = {
@@ -161,7 +163,7 @@
     let h = null;
     try { h = localStorage.getItem(KEYS.hash); } catch (e) {}
     if (!h) {
-      h = await sha256(DEFAULT_PASS);
+      h = DEFAULT_HASH;
       try { localStorage.setItem(KEYS.hash, h); } catch (e) {}
     }
     return h;
@@ -825,17 +827,30 @@
     const next = $("#set-pass-new").value;
     const confirm = $("#set-pass-confirm").value;
     if (!cur || !next || !confirm) { err.textContent = "Completa los tres campos."; return; }
-    if (next.length < 6) { err.textContent = "La nueva clave debe tener al menos 6 caracteres."; return; }
+    if (next.length < 10) { err.textContent = "La nueva clave debe tener al menos 10 caracteres."; return; }
     if (next !== confirm) { err.textContent = "Las claves nuevas no coinciden."; return; }
     const stored = await storedHash();
     const attempt = await sha256(cur);
     if (attempt !== stored) { err.textContent = "La clave actual no es correcta."; return; }
-    const h = await sha256(next);
-    try { localStorage.setItem(KEYS.hash, h); } catch (e) { err.textContent = "No se pudo guardar la clave."; return; }
-    $("#set-pass-current").value = "";
-    $("#set-pass-new").value = "";
-    $("#set-pass-confirm").value = "";
-    toast("Clave actualizada. Úsala la próxima vez.");
+    const btn = $("#btn-change-pass");
+    btn.disabled = true;
+    try {
+      // Primero la nube: si falla, la clave local no se toca.
+      if (window.LTCloud && window.LTCloud.ready()) {
+        await window.LTCloud.changePassword(cur, next);
+      }
+      const h = await sha256(next);
+      try { localStorage.setItem(KEYS.hash, h); } catch (e) { err.textContent = "No se pudo guardar la clave."; return; }
+      session.setPass(next);
+      $("#set-pass-current").value = "";
+      $("#set-pass-new").value = "";
+      $("#set-pass-confirm").value = "";
+      toast("Clave actualizada y sincronizada con la nube.");
+    } catch (e) {
+      err.textContent = "No se pudo cambiar en la nube: " + e.message;
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   function updateDataInfo() {

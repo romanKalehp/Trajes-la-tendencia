@@ -96,5 +96,25 @@ window.LTCloud = (function () {
     return res.json().catch(() => ({}));
   }
 
-  return { ready: ready, load: load, version: version, save: save };
+  async function changePassword(oldPass, newPass) {
+    if (!ready()) throw new Error("La nube no está configurada.");
+    const c = cfg();
+    const url = base() + "/rest/v1/rpc/change_catalog_password";
+    const res = await request(url, {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, headers()),
+      body: JSON.stringify({ p_old: oldPass || "", p_new: newPass || "" })
+    }, (c.timeout || 3500) * 3);
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try {
+        const body = await res.json();
+        if (body && (body.message || body.error)) msg = body.message || body.error;
+      } catch (e) { /* respuesta sin JSON */ }
+      throw new Error(msg);
+    }
+    return res.json().catch(() => ({}));
+  }
+
+  return { ready: ready, load: load, version: version, save: save, changePassword: changePassword };
 })();
