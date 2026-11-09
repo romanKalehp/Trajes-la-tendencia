@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administración · Trajes La Tendencia</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Panel privado de Trajes La Tendencia para administrar el catálogo, las fotos y los pedidos del taller.">
+<meta name="theme-color" content="#2A0A15">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true">
+  <symbol id="a-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="a-box" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></symbol>
+  <symbol id="a-receipt" viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3Z"/><path d="M9 8h6M9 12h6M9 16h4"/></symbol>
+  <symbol id="a-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+  <symbol id="a-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="a-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></symbol>
+  <symbol id="a-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13M10 11v5M14 11v5"/></symbol>
+  <symbol id="a-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="a-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="a-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="a-logout" viewBox="0 0 24 24"><path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/></symbol>
+  <symbol id="a-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-8 8"/><path d="M18 14v5H5V6h5"/></symbol>
+  <symbol id="a-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/></symbol>
+  <symbol id="a-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5-5 4 4 3-3 4 4"/></symbol>
+  <symbol id="a-wa" viewBox="0 0 24 24"><path d="M20.5 11.6a8.4 8.4 0 0 1-12.4 7.5L4 20.5l1.4-4a8.4 8.4 0 1 1 15.1-4.9Z"/><path d="M8.8 8.2c.3-.6.6-.6 1-.6h.5c.2 0 .4.1.5.4l.7 1.6c.1.3.1.5-.1.7l-.5.6c-.2.2-.1.4 0 .6.5.8 1.2 1.5 2 2 .2.1.4.2.6 0l.6-.6c.2-.2.4-.3.7-.2l1.6.7c.3.1.4.3.4.5v.5c0 .4 0 .7-.6 1a3 3 0 0 1-2.3.7c-1-.2-2.4-.8-3.6-2-1.2-1.2-1.8-2.6-2-3.6a3 3 0 0 1 .5-2.3Z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="a-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
+  <symbol id="a-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+  <symbol id="a-download" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/></symbol>
+  <symbol id="a-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 6.7"/><path d="M20 4v7h-7"/></symbol>
+  <symbol id="a-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+  <symbol id="a-truck" viewBox="0 0 24 24"><path d="M3 7h10v9H3zM13 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></symbol>
+  <symbol id="a-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="a-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+</svg>
+
+<!-- ================= LOGIN ================= -->
+<main class="login" id="login-screen">
+  <div class="login__brand">
+    <div class="login__brand-top">
+      <img src="assets/img/logo.svg" alt="" width="72" height="72">
+      <div>
+        <p class="login__kicker">Trajes y confecciones</p>
+        <h1>Trajes La Tendencia</h1>
+      </div>
+    </div>
+    <div class="login__art">
+      <img src="assets/img/hero.svg" alt="Traje ceremonial marfil con bordado dorado">
+    </div>
+    <div class="login__brand-bottom">
+      <p>Panel privado del taller</p>
+      <ul>
+        <li><svg class="ico"><use href="#a-check"/></svg> Agrega, edita y elimina productos</li>
+        <li><svg class="ico"><use href="#a-check"/></svg> Sube fotos desde tu computadora</li>
+        <li><svg class="ico"><use href="#a-check"/></svg> Revisa los pedidos recibidos</li>
+      </ul>
+      <span>Sipacapa, San Marcos · Guatemala</span>
+    </div>
+  </div>
+
+  <div class="login__panel">
+    <form class="login__form" id="login-form" autocomplete="off">
+      <p class="kicker">Acceso privado</p>
+      <h2>Bienvenida de nuevo</h2>
+      <p class="login__lead">Ingresa tu clave para administrar el catálogo, los pedidos y la configuración de la tienda.</p>
+
+      <label class="field">
+        <span>Clave de administración</span>
+        <div class="pass-wrap">
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" required>
+          <button type="button" class="pass-toggle" id="toggle-pass" aria-label="Mostrar clave">
+            <svg class="ico"><use href="#a-eye"/></svg>
+          </button>
+        </div>
+      </label>
+
+      <p class="form-error" id="login-error" role="alert"></p>
+      <button type="submit" class="btn btn--primary btn--full">Entrar al panel <svg class="ico"><use href="#a-arrow"/></svg></button>
+
+      <div class="login__hint">
+        <svg class="ico"><use href="#a-lock"/></svg>
+        <p>Clave inicial: <strong>LT2026</strong>. Cámbiala en <b>Ajustes → Seguridad</b>.</p>
+      </div>
+    </form>
+    <p class="login__foot">© <span id="login-year">2026</span> Trajes La Tendencia · <a href="index.html">Volver a la tienda</a></p>
+  </div>
+</main>
+
+<!-- ================= APLICACIÓN ================= -->
+<div class="admin" id="admin-app" hidden>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__head">
+      <a class="sidebar__brand" href="index.html">
+        <img src="assets/img/logo.svg" alt="" width="46" height="46">
+        <span><strong>La Tendencia</strong><small>Administración</small></span>
+      </a>
+      <button class="icon-btn sidebar__close" id="btn-close-sidebar" aria-label="Cerrar menú">
+        <svg class="ico"><use href="#a-close"/></svg>
+      </button>
+    </div>
+
+    <nav class="sidebar__nav" aria-label="Secciones del panel">
+      <button class="side-link is-active" data-view-link="dashboard">
+        <svg class="ico"><use href="#a-grid"/></svg> Resumen
+      </button>
+      <button class="side-link" data-view-link="products">
+        <svg class="ico"><use href="#a-box"/></svg> Productos
+        <span class="side-badge" id="side-count-products">0</span>
+      </button>
+      <button class="side-link" data-view-link="orders">
+        <svg class="ico"><use href="#a-receipt"/></svg> Pedidos
+        <span class="side-badge side-badge--alert" id="side-count-orders">0</span>
+      </button>
+      <button class="side-link" data-view-link="settings">
+        <svg class="ico"><use href="#a-settings"/></svg> Ajustes
+      </button>
+    </nav>
+
+    <div class="sidebar__foot">
+      <a class="side-store" href="index.html" target="_blank" rel="noopener">
+        <svg class="ico"><use href="#a-external"/></svg> Ver la tienda
+      </a>
+      <button class="side-logout" id="btn-logout">
+        <svg class="ico"><use href="#a-logout"/></svg> Cerrar sesión
+      </button>
+      <p>Trajes La Tendencia · v1.0</p>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn topbar__menu" id="btn-open-sidebar" aria-label="Abrir menú">
+        <svg class="ico"><use href="#a-menu"/></svg>
+      </button>
+      <div class="topbar__titles">
+        <h1 id="view-title">Resumen</h1>
+        <p id="view-subtitle">Todo lo que pasa en tu tienda, de un vistazo.</p>
+      </div>
+      <div class="topbar__actions">
+        <a class="btn btn--ghost btn--sm" href="index.html" target="_blank" rel="noopener">
+          <svg class="ico"><use href="#a-external"/></svg> Ver tienda
+        </a>
+        <button class="btn btn--primary btn--sm" id="btn-new-product">
+          <svg class="ico"><use href="#a-plus"/></svg> Nuevo producto
+        </button>
+        <span class="avatar" title="Administradora">LT</span>
+      </div>
+    </header>
+
+    <main class="views">
+
+      <!-- ============ RESUMEN ============ -->
+      <section class="view is-active" data-view="dashboard">
+        <div class="notice notice--info">
+          <svg class="ico"><use href="#a-wa"/></svg>
+          <p><strong>Notificación de pedidos:</strong> cada compra abre WhatsApp con el resumen completo para el taller. Además, el pedido queda guardado en el navegador donde se hizo la compra; esta lista muestra solo los pedidos realizados en <b>este mismo dispositivo</b>.</p>
+        </div>
+
+        <div class="kpis">
+          <article class="kpi">
+            <span class="kpi__icon"><svg class="ico"><use href="#a-box"/></svg></span>
+            <p>Productos activos</p>
+            <strong id="kpi-products">0</strong>
+            <small id="kpi-products-note">—</small>
+          </article>
+          <article class="kpi">
+            <span class="kpi__icon"><svg class="ico"><use href="#a-receipt"/></svg></span>
+            <p>Pedidos en este navegador</p>
+            <strong id="kpi-orders">0</strong>
+            <small id="kpi-orders-note">—</small>
+          </article>
+          <article class="kpi">
+            <span class="kpi__icon kpi__icon--gold"><svg class="ico"><use href="#a-check"/></svg></span>
+            <p>Ingresos confirmados</p>
+            <strong id="kpi-revenue">Q0</strong>
+            <small id="kpi-revenue-note">—</small>
+          </article>
+          <article class="kpi">
+            <span class="kpi__icon kpi__icon--rose"><svg class="ico"><use href="#a-truck"/></svg></span>
+            <p>Por atender</p>
+            <strong id="kpi-pending">0</strong>
+            <small id="kpi-pending-note">—</small>
+          </article>
+        </div>
+
+        <div class="dash-grid">
+          <section class="panel">
+            <header class="panel__head">
+              <div><h2>Últimos pedidos</h2><p>Los más recientes de este dispositivo.</p></div>
+              <button class="link-btn" data-go="orders">Ver todos <svg class="ico"><use href="#a-arrow"/></svg></button>
+            </header>
+            <div class="table-wrap">
+              <table class="table">
+                <thead><tr><th>Pedido</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead>
+                <tbody id="recent-orders"></tbody>
+              </table>
+            </div>
+            <p class="empty-mini" id="recent-empty">Aún no hay pedidos. Cuando alguien compre, aparecerá aquí.</p>
+          </section>
+
+          <section class="panel">
+            <header class="panel__head">
+              <div><h2>Stock bajo</h2><p>Piezas con 3 unidades o menos.</p></div>
+              <button class="link-btn" data-go="products">Gestionar <svg class="ico"><use href="#a-arrow"/></svg></button>
+            </header>
+            <div class="lowstock" id="low-stock"></div>
+            <p class="empty-mini" id="low-empty">Todo tu inventario está en buen nivel.</p>
+          </section>
+        </div>
+
+        <div class="quick-grid">
+          <button class="quick-card" data-go="products" id="quick-product">
+            <span><svg class="ico"><use href="#a-plus"/></svg></span>
+            <strong>Agregar un producto</strong>
+            <small>Sube fotos, define precio y tallas.</small>
+          </button>
+          <button class="quick-card" data-go="orders">
+            <span><svg class="ico"><use href="#a-receipt"/></svg></span>
+            <strong>Revisar pedidos</strong>
+            <small>Confirma, prepara y entrega.</small>
+          </button>
+          <button class="quick-card" data-go="settings">
+            <span><svg class="ico"><use href="#a-download"/></svg></span>
+            <strong>Respaldar catálogo</strong>
+            <small>Descarga una copia de tus datos.</small>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ PRODUCTOS ============ -->
+      <section class="view" data-view="products">
+        <div class="toolbar">
+          <div class="search-box">
+            <svg class="ico"><use href="#a-search"/></svg>
+            <input type="search" id="product-search" placeholder="Buscar por nombre…" aria-label="Buscar producto">
+          </div>
+          <div class="toolbar__group">
+            <select id="product-filter-cat" aria-label="Filtrar por categoría">
+              <option value="all">Todas las categorías</option>
+            </select>
+            <select id="product-filter-status" aria-label="Filtrar por estado">
+              <option value="all">Todos los estados</option>
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+              <option value="low">Stock bajo</option>
+            </select>
+            <button class="btn btn--primary btn--sm" id="btn-new-product-2">
+              <svg class="ico"><use href="#a-plus"/></svg> Nuevo
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="table table--products">
+              <thead>
+                <tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th class="t-right">Acciones</th></tr>
+              </thead>
+              <tbody id="products-tbody"></tbody>
+            </table>
+          </div>
+          <p class="empty-state" id="products-empty" hidden>No hay productos que coincidan con la búsqueda.</p>
+        </div>
+        <p class="table-note"><svg class="ico"><use href="#a-image"/></svg> Las fotos se guardan comprimidas dentro del catálogo. Para publicar los cambios en la web, usa <b>Ajustes → Exportar catálogo</b>.</p>
+      </section>
+
+      <!-- ============ PEDIDOS ============ -->
+      <section class="view" data-view="orders">
+        <div class="notice notice--info">
+          <svg class="ico"><use href="#a-wa"/></svg>
+          <p><strong>Tu libro de pedidos es WhatsApp.</strong> Cada pedido nuevo llega a tu WhatsApp con todos los datos. Esta lista guarda únicamente los pedidos hechos desde este navegador (por ejemplo, ventas registradas en el taller).</p>
+        </div>
+        <div class="toolbar">
+          <div class="search-box">
+            <svg class="ico"><use href="#a-search"/></svg>
+            <input type="search" id="order-search" placeholder="Buscar por código, cliente o teléfono…" aria-label="Buscar pedido">
+          </div>
+          <div class="toolbar__group">
+            <select id="order-status-filter" aria-label="Filtrar por estado">
+              <option value="all">Todos los estados</option>
+              <option value="pendiente">Pendientes</option>
+              <option value="pagado">Pagados</option>
+              <option value="preparando">En preparación</option>
+              <option value="enviado">Enviados</option>
+              <option value="entregado">Entregados</option>
+              <option value="cancelado">Cancelados</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="orders" id="orders-list"></div>
+        <div class="empty-state empty-state--box" id="orders-empty" hidden>
+          <svg class="ico"><use href="#a-receipt"/></svg>
+          <p>No hay pedidos guardados en este navegador.</p>
+          <small>Los pedidos de tus clientes llegan directamente a tu WhatsApp. Aquí solo se guardan los que se hacen desde este mismo dispositivo.</small>
+        </div>
+      </section>
+
+      <!-- ============ AJUSTES ============ -->
+      <section class="view" data-view="settings">
+        <form id="settings-form">
+          <div class="settings-grid">
+
+            <section class="panel">
+              <header class="panel__head"><div><h2>Datos del negocio</h2><p>Así te contactan y te encuentran.</p></div></header>
+              <div class="form-grid">
+                <label class="field field--full"><span>Número de WhatsApp *</span><input type="tel" id="set-whatsapp" inputmode="numeric" autocomplete="off" placeholder="50233451029"></label>
+                <label class="field field--full"><span>Teléfono visible en la página</span><input type="tel" id="set-phone" autocomplete="off" placeholder="3345 1029"></label>
+                <p class="field-note field--full" id="wa-preview">—</p>
+                <p class="form-error field--full" id="wa-error"></p>
+                <label class="field"><span>Nombre del negocio</span><input type="text" id="set-name"></label>
+                <label class="field"><span>Correo</span><input type="email" id="set-email"></label>
+                <label class="field field--full"><span>Dirección</span><input type="text" id="set-address"></label>
+                <label class="field field--full"><span>Facebook</span><input type="url" id="set-facebook"></label>
+              </div>
+              <button type="submit" class="btn btn--primary btn--sm" style="margin-top:16px">Guardar número</button>
+              <p class="field-note">Escribe el número con código de país, sin <b>+</b>, espacios ni guiones. Ejemplo: <b>50233451029</b>. Para cambiarlo, borra los dígitos y escribe el nuevo.</p>
+            </section>
+
+            <section class="panel">
+              <header class="panel__head"><div><h2>Envíos y pagos</h2><p>Reglas que se aplican en el checkout.</p></div></header>
+              <div class="form-grid">
+                <label class="field"><span>Envío gratis desde (Q)</span><input type="number" id="set-free" min="0" step="1"></label>
+                <label class="field"><span>Recargo contra entrega (Q)</span><input type="number" id="set-cod" min="0" step="1"></label>
+                <label class="field"><span>Envío en San Marcos (Q)</span><input type="number" id="set-ship-local" min="0" step="1"></label>
+                <label class="field"><span>Envío nacional (Q)</span><input type="number" id="set-ship-national" min="0" step="1"></label>
+              </div>
+              <div class="form-grid" style="margin-top:14px">
+                <label class="field"><span>Banco</span><input type="text" id="set-bank"></label>
+                <label class="field"><span>Número de cuenta</span><input type="text" id="set-account"></label>
+                <label class="field"><span>Titular</span><input type="text" id="set-holder"></label>
+                <label class="field"><span>Tipo de cuenta</span><input type="text" id="set-account-type"></label>
+              </div>
+              <button type="submit" class="btn btn--primary btn--sm" style="margin-top:16px">Guardar cambios</button>
+            </section>
+
+            <section class="panel">
+              <header class="panel__head"><div><h2>Seguridad</h2><p>Cambia la clave de acceso al panel.</p></div></header>
+              <div class="form-grid">
+                <label class="field field--full"><span>Clave actual</span><input type="password" id="set-pass-current" autocomplete="current-password"></label>
+                <label class="field"><span>Nueva clave</span><input type="password" id="set-pass-new" autocomplete="new-password"></label>
+                <label class="field"><span>Repetir nueva clave</span><input type="password" id="set-pass-confirm" autocomplete="new-password"></label>
+              </div>
+              <p class="form-error" id="pass-error"></p>
+              <button type="button" class="btn btn--ghost btn--sm" id="btn-change-pass">Actualizar clave</button>
+              <p class="field-note">La clave se guarda cifrada en este navegador. Si la olvidas, deberás restablecer los datos del sitio.</p>
+            </section>
+
+            <section class="panel">
+              <header class="panel__head"><div><h2>Catálogo y respaldos</h2><p>Publica o restaura la información de tu tienda.</p></div></header>
+              <div class="data-actions">
+                <button type="button" class="data-btn" id="btn-export-js">
+                  <svg class="ico"><use href="#a-download"/></svg>
+                  <span><strong>Exportar catálogo publicado</strong><small>Descarga <code>data.js</code> con fotos incluidas, listo para reemplazar en el sitio.</small></span>
+                </button>
+                <button type="button" class="data-btn" id="btn-export-json">
+                  <svg class="ico"><use href="#a-copy"/></svg>
+                  <span><strong>Descargar respaldo JSON</strong><small>Copia de seguridad de productos y ajustes.</small></span>
+                </button>
+                <button type="button" class="data-btn" id="btn-import">
+                  <svg class="ico"><use href="#a-upload"/></svg>
+                  <span><strong>Importar catálogo</strong><small>Restaura un respaldo .json o un data.js exportado.</small></span>
+                </button>
+                <input type="file" id="import-file" accept=".json,.js,application/json,text/javascript" hidden>
+                <button type="button" class="data-btn data-btn--danger" id="btn-reset-catalog">
+                  <svg class="ico"><use href="#a-refresh"/></svg>
+                  <span><strong>Restaurar catálogo de ejemplo</strong><small>Borra los cambios locales de productos y vuelve al catálogo original.</small></span>
+                </button>
+                <button type="button" class="data-btn data-btn--danger" id="btn-clear-orders">
+                  <svg class="ico"><use href="#a-trash"/></svg>
+                  <span><strong>Borrar pedidos</strong><small>Elimina el historial de pedidos de este navegador.</small></span>
+                </button>
+              </div>
+              <p class="field-note" id="data-info">—</p>
+            </section>
+          </div>
+        </form>
+
+        <div class="publish">
+          <div class="publish__icon"><svg class="ico"><use href="#a-upload"/></svg></div>
+          <div>
+            <h3>¿Cómo publico mis cambios?</h3>
+            <p>El panel guarda los cambios en este navegador. Para que los vea todo el mundo, exporta el catálogo y reemplaza el archivo <code>js/data.js</code> en tu hosting. Las fotos nuevas viajan dentro de ese archivo, sin servicios externos.</p>
+          </div>
+          <ol>
+            <li><span>1</span> Edita productos y ajustes.</li>
+            <li><span>2</span> Presiona <b>Exportar catálogo publicado</b>.</li>
+            <li><span>3</span> Sube el nuevo <code>data.js</code> a <code>js/</code>.</li>
+            <li><span>4</span> Recarga la tienda y verifica.</li>
+          </ol>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ================= MODAL PRODUCTO ================= -->
+<div class="modal" id="product-form-modal" aria-hidden="true">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__box modal__box--wide" role="dialog" aria-modal="true" aria-labelledby="pf-title">
+    <header class="modal__head">
+      <div><p class="kicker">Catálogo</p><h2 id="pf-title">Nuevo producto</h2></div>
+      <button class="icon-btn" data-close aria-label="Cerrar"><svg class="ico"><use href="#a-close"/></svg></button>
+    </header>
+
+    <form id="product-form" class="modal__body">
+      <div class="product-form">
+        <div class="product-form__main">
+          <div class="form-grid">
+            <label class="field field--full"><span>Nombre del producto *</span><input type="text" id="pf-name" required maxlength="80" placeholder="Ej. Traje Regional Bordado"></label>
+            <label class="field"><span>Categoría *</span>
+              <select id="pf-category" required>
+                <option value="trajes">Trajes</option>
+                <option value="blusas">Blusas</option>
+                <option value="cortes">Cortes típicos</option>
+              </select>
+            </label>
+            <label class="field"><span>Etiqueta</span>
+              <select id="pf-badge">
+                <option value="">Sin etiqueta</option>
+                <option>Nuevo</option>
+                <option>Más vendido</option>
+                <option>Edición limitada</option>
+                <option>Hecho a mano</option>
+              </select>
+            </label>
+            <label class="field"><span>Precio (Q) *</span><input type="number" id="pf-price" min="1" step="1" required placeholder="850"></label>
+            <label class="field"><span>Precio anterior (Q)</span><input type="number" id="pf-compare" min="0" step="1" placeholder="Opcional"></label>
+            <label class="field"><span>Stock disponible</span><input type="number" id="pf-stock" min="0" step="1" value="10"></label>
+            <label class="field"><span>Tallas (separadas por coma)</span><input type="text" id="pf-sizes" placeholder="S, M, L, XL"></label>
+            <label class="field field--full"><span>Colores (nombre:hex, separados por coma)</span><input type="text" id="pf-colors" placeholder="Rosa:#C2185B, Vino:#7B1733"></label>
+            <label class="field field--full"><span>Descripción</span><textarea id="pf-desc" rows="3" placeholder="Cuenta la historia de esta pieza…"></textarea></label>
+            <label class="field field--full"><span>Detalles (uno por línea)</span><textarea id="pf-details" rows="3" placeholder="Hecho a mano&#10;Tela de algodón"></textarea></label>
+          </div>
+
+          <div class="checks">
+            <label class="check"><input type="checkbox" id="pf-featured" checked><span>Mostrar en destacados</span></label>
+            <label class="check"><input type="checkbox" id="pf-active" checked><span>Producto visible en la tienda</span></label>
+          </div>
+        </div>
+
+        <div class="product-form__media">
+          <div class="field-head"><span>Fotos del producto</span><small>La primera es la portada</small></div>
+          <div class="upload-zone" id="pf-drop">
+            <svg class="ico"><use href="#a-upload"/></svg>
+            <strong>Arrastra tus fotos aquí</strong>
+            <span>o haz clic para elegirlas</span>
+            <small>JPG, PNG o WebP · se comprimen automáticamente</small>
+            <input type="file" id="pf-file" accept="image/*" multiple hidden>
+          </div>
+          <div class="image-grid" id="pf-images"></div>
+          <p class="field-note">Puedes subir varias fotos. La primera será la que se vea en la tienda.</p>
+        </div>
+      </div>
+
+      <p class="form-error" id="pf-error"></p>
+    </form>
+
+    <footer class="modal__foot">
+      <button type="button" class="btn btn--ghost btn--sm" data-close>Cancelar</button>
+      <button type="submit" form="product-form" class="btn btn--primary btn--sm" id="pf-save">
+        <svg class="ico"><use href="#a-check"/></svg> Guardar producto
+      </button>
+    </footer>
+  </div>
+</div>
+
+<!-- ================= MODAL PEDIDO ================= -->
+<div class="modal" id="order-modal" aria-hidden="true">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="order-modal-title">
+    <header class="modal__head">
+      <div><p class="kicker">Pedido</p><h2 id="order-modal-title">Detalle</h2></div>
+      <button class="icon-btn" data-close aria-label="Cerrar"><svg class="ico"><use href="#a-close"/></svg></button>
+    </header>
+    <div class="modal__body" id="order-detail"></div>
+    <footer class="modal__foot modal__foot--split">
+      <div class="order-status">
+        <label for="order-status-select">Estado</label>
+        <select id="order-status-select"></select>
+        <button class="btn btn--ghost btn--sm" id="btn-order-save">Guardar</button>
+      </div>
+      <div class="modal__foot-actions">
+        <a class="btn btn--wa btn--sm" id="btn-order-wa" href="#" target="_blank" rel="noopener"><svg class="ico"><use href="#a-wa"/></svg> Enviar al taller</a>
+        <a class="btn btn--ghost btn--sm" id="btn-order-customer" href="#" target="_blank" rel="noopener"><svg class="ico"><use href="#a-wa"/></svg> Cliente</a>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="admin-toast" role="status" aria-live="polite"></div>
+
+<button class="fab" id="btn-fab-new" aria-label="Nuevo producto"><svg class="ico"><use href="#a-plus"/></svg></button>
+
+<script src="js/data.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

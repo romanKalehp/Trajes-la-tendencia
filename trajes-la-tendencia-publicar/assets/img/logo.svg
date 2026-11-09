@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img">
+  <defs>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D81B60"/><stop offset="1" stop-color="#8A0E3E"/>
+    </linearGradient>
+  </defs>
+  <circle cx="200" cy="200" r="196" fill="#FFFFFF"/>
+  <circle cx="200" cy="200" r="178" fill="none" stroke="url(#ring)" stroke-width="34"/>
+  <g fill="#B0134F">
+    <path d="M148 128 L164 84 L184 116 L200 68 L216 116 L236 84 L252 128 Z"/>
+    <rect x="145" y="133" width="110" height="14" rx="7"/>
+    <circle cx="164" cy="82" r="6"/><circle cx="200" cy="66" r="6.5"/><circle cx="236" cy="82" r="6"/>
+    <circle cx="149" cy="126" r="4"/><circle cx="251" cy="126" r="4"/>
+  </g>
+  <g font-family="Georgia, 'Times New Roman', serif" fill="#8A0E3E" text-anchor="middle">
+    <text x="200" y="250" font-size="96" letter-spacing="1" font-style="italic">LT</text>
+    <text x="200" y="296" font-size="23" letter-spacing="2" textLength="208" lengthAdjust="spacingAndGlyphs">LA TENDENCIA</text>
+    <text x="200" y="320" font-size="10.5" letter-spacing="1.5" textLength="176" lengthAdjust="spacingAndGlyphs" fill="#B0134F" font-family="'DM Sans', Arial, sans-serif">TRAJES Y CONFECCIONES</text>
+  </g>
+  <path d="M126 212 q74 38 148 0" fill="none" stroke="#C9A227" stroke-width="2" opacity=".9"/>
+  <path d="M200 340 l6 8 -6 8 -6 -8 z" fill="#C9A227"/>
+</svg>

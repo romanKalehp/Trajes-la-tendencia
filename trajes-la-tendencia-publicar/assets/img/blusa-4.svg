@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ECF5F5"/><stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="fab" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#45ABAB"/><stop offset=".55" stop-color="#2A8C8C"/><stop offset="1" stop-color="#17605F"/>
+    </linearGradient>
+    <linearGradient id="skirt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A8C8C"/><stop offset="1" stop-color="#17605F"/>
+    </linearGradient>
+    <linearGradient id="softbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D5E9E9"/><stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <pattern id="weave" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path d="M0 5h10M5 0v10" stroke="#0F4A49" stroke-width="1" opacity=".16"/>
+    </pattern>
+    <pattern id="diamond" width="56" height="44" patternUnits="userSpaceOnUse">
+      <path d="M28 4 L50 22 L28 40 L6 22 Z" fill="none" stroke="#0F4A49" stroke-width="3" opacity=".8"/>
+      <path d="M28 14 L38 22 L28 30 L18 22 Z" fill="#F4E4B8" opacity=".85"/>
+    </pattern>
+    <pattern id="zig" width="44" height="26" patternUnits="userSpaceOnUse">
+      <path d="M0 20 L11 6 L22 20 L33 6 L44 20" fill="none" stroke="#F4E4B8" stroke-width="3" opacity=".8"/>
+    </pattern>
+    <pattern id="lace" width="46" height="46" patternUnits="userSpaceOnUse">
+      <circle cx="23" cy="23" r="16" fill="none" stroke="#0F4A49" stroke-width="1.6" opacity=".55"/>
+      <circle cx="0" cy="0" r="10" fill="none" stroke="#0F4A49" stroke-width="1.4" opacity=".4"/>
+      <circle cx="46" cy="0" r="10" fill="none" stroke="#0F4A49" stroke-width="1.4" opacity=".4"/>
+      <circle cx="0" cy="46" r="10" fill="none" stroke="#0F4A49" stroke-width="1.4" opacity=".4"/>
+      <circle cx="46" cy="46" r="10" fill="none" stroke="#0F4A49" stroke-width="1.4" opacity=".4"/>
+      <circle cx="23" cy="23" r="2.5" fill="#0F4A49" opacity=".5"/>
+    </pattern>
+    <filter id="blur" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="24"/></filter>
+    <clipPath id="skirtClip"><path d="M292 556 L214 892 Q400 926 586 892 L508 556 Z"/></clipPath>
+    <clipPath id="topClip"><path d="M262 306 Q400 264 538 306 L610 450 L554 472 L520 408 L520 594 L280 594 L280 408 L246 472 L190 450 Z"/></clipPath>
+    <clipPath id="blouseClip"><path d="M262 300 Q400 258 538 300 L610 444 L554 466 L520 402 L520 700 Q400 726 280 700 L280 402 L246 466 L190 444 Z"/></clipPath>
+  </defs>  <rect width="800" height="1000" fill="url(#bg)"/>
+  <circle cx="400" cy="470" r="318" fill="#D5E9E9" opacity=".72"/>
+  <circle cx="400" cy="470" r="318" fill="none" stroke="#0F4A49" stroke-width="1.4" opacity=".22"/>
+  <g stroke="#0F4A49" fill="none" stroke-width="2" opacity=".20" stroke-linecap="round">
+    <path d="M92 742 q42 -98 18 -178"/>
+    <path d="M110 646 q40 -12 46 -50 q-44 4 -46 50"/>
+    <path d="M100 690 q-44 -8 -54 -44 q46 0 54 44"/>
+    <path d="M708 258 q-34 62 -14 120"/>
+    <path d="M694 318 q-34 10 -40 42 q36 -4 40 -42"/>
+  </g>  <g stroke="#0F4A49" stroke-width="7" fill="none" opacity=".45" stroke-linecap="round">
+    <path d="M400 126 v-32 a24 24 0 1 1 24 24"/>
+    <path d="M400 126 L286 214 L514 214 Z"/>
+  </g>
+  <ellipse cx="400" cy="782" rx="190" ry="24" fill="#C6E0E0" opacity=".5" filter="url(#blur)"/>
+  <path d="M262 300 Q400 258 538 300 L610 444 L554 466 L520 402 L520 700 Q400 726 280 700 L280 402 L246 466 L190 444 Z" fill="url(#fab)"/>
+  <g clip-path="url(#blouseClip)">
+    <rect x="180" y="250" width="450" height="490" fill="url(#weave)"/>
+    <rect x="180" y="250" width="450" height="490" fill="url(#lace)" opacity=".45"/>
+    <rect x="280" y="646" width="240" height="16" fill="#F4E4B8" opacity=".9"/>
+    <rect x="280" y="670" width="240" height="30" fill="url(#diamond)" opacity=".45"/>
+    <path d="M302 300 L302 710" stroke="#fff" stroke-width="28" opacity=".12"/>
+    <path d="M498 300 L498 710" stroke="#000" stroke-width="28" opacity=".06"/>
+  </g>
+  <path d="M360 296 L440 296 L440 378 L360 378 Z" fill="#D5E9E9"/>
+  <path d="M360 296 L440 296 L440 378 L360 378 Z" fill="none" stroke="#0F4A49" stroke-width="16" opacity=".9"/>
+  <path d="M360 296 L440 296 L440 378 L360 378 Z" fill="none" stroke="#F4E4B8" stroke-width="5"/>
+  <path d="M190 444 L246 466" stroke="#0F4A49" stroke-width="16"/>
+  <path d="M554 466 L610 444" stroke="#0F4A49" stroke-width="16"/>
+  <path d="M190 444 L246 466" stroke="#F4E4B8" stroke-width="5"/>
+  <path d="M554 466 L610 444" stroke="#F4E4B8" stroke-width="5"/>
+  <path d="M280 700 q20 30 40 0 q20 30 40 0 q20 30 40 0 q20 30 40 0 q20 30 40 0 q20 30 40 0" fill="none" stroke="#F4E4B8" stroke-width="5" opacity=".9"/>
+  <path d="M262 300 Q400 258 538 300" stroke="#fff" stroke-width="5" fill="none" opacity=".32"/>
+  <g opacity=".85">
+    <circle cx="330" cy="520" r="7" fill="#F4E4B8"/><circle cx="400" cy="500" r="7" fill="#F4E4B8"/><circle cx="470" cy="520" r="7" fill="#F4E4B8"/>
+    <circle cx="365" cy="580" r="6" fill="#0F4A49"/><circle cx="435" cy="580" r="6" fill="#0F4A49"/>
+    <path d="M330 520 q35 -34 70 0 q35 34 70 0" fill="none" stroke="#0F4A49" stroke-width="2" opacity=".5"/>
+  </g>
+</svg>
