@@ -18,6 +18,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true">
   <symbol id="a-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
   <symbol id="a-box" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></symbol>
+  <symbol id="a-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l9 9-7 7-10-8Z"/><circle cx="7.5" cy="7.5" r="1.4"/></symbol>
+  <symbol id="a-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+  <symbol id="a-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
   <symbol id="a-receipt" viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3Z"/><path d="M9 8h6M9 12h6M9 16h4"/></symbol>
   <symbol id="a-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
   <symbol id="a-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
@@ -114,6 +117,9 @@
       <button class="side-link" data-view-link="products">
         <svg class="ico"><use href="#a-box"/></svg> Productos
         <span class="side-badge" id="side-count-products">0</span>
+      </button>
+      <button class="side-link" data-view-link="categories">
+        <svg class="ico"><use href="#a-tag"/></svg> Categorías
       </button>
       <button class="side-link" data-view-link="orders">
         <svg class="ico"><use href="#a-receipt"/></svg> Pedidos
@@ -275,6 +281,34 @@
         <p class="table-note"><svg class="ico"><use href="#a-image"/></svg> Las fotos se guardan comprimidas dentro del catálogo. Para publicar los cambios en la web, usa <b>Ajustes → Exportar catálogo</b>.</p>
       </section>
 
+      <!-- ============ CATEGORÍAS ============ -->
+      <section class="view" data-view="categories">
+        <div class="toolbar">
+          <div class="toolbar__intro">
+            <h2 class="view-subhead">Tipos de producto</h2>
+            <p>Agrega, renombra u ordena las categorías que aparecen en la tienda.</p>
+          </div>
+          <div class="toolbar__group">
+            <button class="btn btn--primary btn--sm" id="btn-new-category">
+              <svg class="ico"><use href="#a-plus"/></svg> Nueva categoría
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="table table--categories">
+              <thead>
+                <tr><th>Categoría</th><th>Descripción</th><th>Productos</th><th class="t-right">Acciones</th></tr>
+              </thead>
+              <tbody id="categories-tbody"></tbody>
+            </table>
+          </div>
+          <p class="empty-state" id="categories-empty" hidden>No hay categorías. Crea la primera para organizar tus productos.</p>
+        </div>
+        <p class="table-note"><svg class="ico"><use href="#a-tag"/></svg> El orden de esta lista es el mismo que se muestra en el menú y en los filtros de la tienda. Si eliminas una categoría con productos, te pediremos moverlos a otra.</p>
+      </section>
+
       <!-- ============ PEDIDOS ============ -->
       <section class="view" data-view="orders">
         <div class="notice notice--info">
@@ -403,6 +437,47 @@
       </section>
 
     </main>
+  </div>
+</div>
+
+<!-- ================= MODAL CATEGORÍA ================= -->
+<div class="modal" id="category-form-modal" aria-hidden="true">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="cf-title">
+    <header class="modal__head">
+      <div><p class="kicker">Catálogo</p><h2 id="cf-title">Nueva categoría</h2></div>
+      <button class="icon-btn" data-close aria-label="Cerrar"><svg class="ico"><use href="#a-close"/></svg></button>
+    </header>
+
+    <form id="category-form" class="modal__body">
+      <div class="form-grid">
+        <label class="field field--full"><span>Nombre de la categoría *</span><input type="text" id="cf-name" required maxlength="40" placeholder="Ej. Accesorios"></label>
+        <label class="field field--full"><span>Descripción corta</span><input type="text" id="cf-short" maxlength="70" placeholder="Ej. Carteras, joyería y detalles"></label>
+        <label class="field field--full"><span>Texto de la tarjeta</span><textarea id="cf-desc" rows="2" placeholder="Una frase que describa esta categoría…"></textarea></label>
+        <div class="field field--full">
+          <span>Imagen de la categoría</span>
+          <div class="cat-image-row">
+            <div class="cat-image-preview" id="cf-preview"></div>
+            <div class="cat-image-actions">
+              <button type="button" class="btn btn--ghost btn--sm" id="cf-pick">
+                <svg class="ico"><use href="#a-upload"/></svg> Subir foto
+              </button>
+              <input type="file" id="cf-file" accept="image/*" hidden>
+              <p class="field-note">Si no subes foto, se usará la primera foto de un producto de esta categoría.</p>
+            </div>
+          </div>
+        </div>
+        <label class="field field--full"><span>O escribe la ruta de una imagen</span><input type="text" id="cf-image-url" placeholder="assets/img/mi-categoria.svg"></label>
+      </div>
+      <p class="form-error" id="cf-error"></p>
+    </form>
+
+    <footer class="modal__foot">
+      <button type="button" class="btn btn--ghost btn--sm" data-close>Cancelar</button>
+      <button type="submit" form="category-form" class="btn btn--primary btn--sm" id="cf-save">
+        <svg class="ico"><use href="#a-check"/></svg> Guardar categoría
+      </button>
+    </footer>
   </div>
 </div>
 
