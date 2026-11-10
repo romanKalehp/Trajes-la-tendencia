@@ -61,6 +61,8 @@
   let catalog = loadCatalog();
   let draftImages = [];
   let editingId = null;
+  let editingCategoryId = null;
+  let categoryImage = "";
   let currentOrderCode = null;
 
   function loadCatalog() {
@@ -75,7 +77,7 @@
       revision: Number(source.revision || 0),
       brand: Object.assign({}, BASE.brand, source.brand || {}),
       settings: Object.assign({}, BASE.settings, source.settings || {}),
-      categories: source.categories || clone(BASE.categories),
+      categories: (Array.isArray(source.categories) && source.categories.length) ? source.categories : clone(BASE.categories),
       products: source.products || [],
       testimonials: source.testimonials || clone(BASE.testimonials || [])
     };
@@ -233,6 +235,7 @@
   const VIEW_META = {
     dashboard: ["Resumen", "Todo lo que pasa en tu tienda, de un vistazo."],
     products: ["Productos", "Agrega piezas, cambia precios y sube fotos."],
+    categories: ["Categorías", "Organiza los tipos de producto que aparecen en la tienda."],
     orders: ["Pedidos", "Revisa, confirma y entrega los pedidos recibidos."],
     settings: ["Ajustes", "Datos del negocio, envíos, seguridad y respaldos."]
   };
@@ -245,6 +248,7 @@
     $("#view-subtitle").textContent = meta[1];
     if (name === "dashboard") renderDashboard();
     if (name === "products") renderProducts();
+    if (name === "categories") renderCategoryList();
     if (name === "orders") renderOrders();
     if (name === "settings") fillSettings();
     closeSidebar();
@@ -267,6 +271,7 @@
     fillCategoryOptions();
     renderDashboard();
     renderProducts();
+    renderCategoryList();
     renderOrders();
     fillSettings();
     updateCounts();
@@ -283,9 +288,17 @@
   function fillCategoryOptions() {
     const opts = catalog.categories.map((c) => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
     const filter = $("#product-filter-cat");
-    if (filter) filter.innerHTML = '<option value="all">Todas las categorías</option>' + opts;
+    if (filter) {
+      const prev = filter.value;
+      filter.innerHTML = '<option value="all">Todas las categorías</option>' + opts;
+      filter.value = catalog.categories.some((c) => c.id === prev) ? prev : "all";
+    }
     const formSel = $("#pf-category");
-    if (formSel) formSel.innerHTML = opts;
+    if (formSel) {
+      const prev = formSel.value;
+      formSel.innerHTML = opts;
+      if (catalog.categories.some((c) => c.id === prev)) formSel.value = prev;
+    }
   }
 
   /* ======================================================================
@@ -398,7 +411,7 @@
       if (!p) return;
       $("#pf-title").textContent = "Editar producto";
       $("#pf-name").value = p.name || "";
-      $("#pf-category").value = p.category || "trajes";
+      $("#pf-category").value = p.category || (catalog.categories[0] && catalog.categories[0].id) || "";
       $("#pf-badge").value = p.badge || "";
       $("#pf-price").value = p.price || "";
       $("#pf-compare").value = p.compareAt || "";
@@ -520,6 +533,8 @@
     const stock = money0($("#pf-stock").value);
     if (name.length < 3) { err.textContent = "El nombre debe tener al menos 3 letras."; $("#pf-name").focus(); return; }
     if (price <= 0) { err.textContent = "El precio debe ser mayor que cero."; $("#pf-price").focus(); return; }
+    const category = $("#pf-category").value;
+    if (!category) { err.textContent = "Primero crea una categoría en la sección Categorías."; return; }
     if (!draftImages.length) { err.textContent = "Sube al menos una foto del producto."; return; }
 
     const data = {
@@ -573,6 +588,158 @@
     renderDashboard();
     updateCounts();
     toast("Producto eliminado.");
+  }
+
+  /* ======================================================================
+     CATEGORÍAS
+     ====================================================================== */
+  function categoryImageFor(c) {
+    if (c.image) return c.image;
+    const p = catalog.products.find((x) => x.category === c.id && (x.images || [])[0]);
+    return p ? p.images[0] : "assets/img/pattern.svg";
+  }
+
+  function renderCategoryList() {
+    const tbody = $("#categories-tbody");
+    if (!tbody) return;
+    tbody.innerHTML = catalog.categories.map((c, i) => {
+      const n = catalog.products.filter((p) => p.category === c.id).length;
+      return `
+        <tr>
+          <td>
+            <div class="prod-cell">
+              <img src="${esc(categoryImageFor(c))}" alt="">
+              <div><strong>${esc(c.name)}</strong><span>${esc(c.short || c.id)}</span></div>
+            </div>
+          </td>
+          <td class="cat-desc">${esc(c.desc || "—")}</td>
+          <td>${n} ${n === 1 ? "producto" : "productos"}</td>
+          <td>
+            <div class="row-actions">
+              <button class="row-btn row-btn--order" data-cat-up="${esc(c.id)}" aria-label="Subir ${esc(c.name)}" title="Subir"${i === 0 ? " disabled" : ""}><svg class="ico"><use href="#a-up"/></svg></button>
+              <button class="row-btn row-btn--order" data-cat-down="${esc(c.id)}" aria-label="Bajar ${esc(c.name)}" title="Bajar"${i === catalog.categories.length - 1 ? " disabled" : ""}><svg class="ico"><use href="#a-down"/></svg></button>
+              <button class="row-btn" data-cat-edit="${esc(c.id)}" aria-label="Editar ${esc(c.name)}" title="Editar"><svg class="ico"><use href="#a-edit"/></svg></button>
+              <button class="row-btn row-btn--del" data-cat-del="${esc(c.id)}" aria-label="Eliminar ${esc(c.name)}" title="Eliminar"><svg class="ico"><use href="#a-trash"/></svg></button>
+            </div>
+          </td>
+        </tr>`;
+    }).join("");
+    const empty = $("#categories-empty");
+    if (empty) empty.hidden = catalog.categories.length > 0;
+  }
+
+  function uniqueCategoryId(name, ignoreId) {
+    const base = slugify(name).slice(0, 40) || "categoria";
+    let id = base, n = 2;
+    while (catalog.categories.some((c) => c.id === id && c.id !== ignoreId)) {
+      id = base + "-" + n;
+      n += 1;
+    }
+    return id;
+  }
+
+  function renderCategoryPreview() {
+    const box = $("#cf-preview");
+    if (!box) return;
+    const src = categoryImage || $("#cf-image-url").value.trim();
+    box.innerHTML = src ? `<img src="${esc(src)}" alt="">` : "<span>Sin imagen</span>";
+  }
+
+  function openCategoryForm(id) {
+    editingCategoryId = id || null;
+    categoryImage = "";
+    $("#cf-error").textContent = "";
+    $("#category-form").reset();
+    $("#cf-file").value = "";
+    const c = id ? catalog.categories.find((x) => x.id === id) : null;
+    $("#cf-title").textContent = c ? "Editar categoría" : "Nueva categoría";
+    if (c) {
+      $("#cf-name").value = c.name || "";
+      $("#cf-short").value = c.short || "";
+      $("#cf-desc").value = c.desc || "";
+      categoryImage = c.image || "";
+      $("#cf-image-url").value = String(c.image || "").startsWith("data:") ? "" : (c.image || "");
+    }
+    renderCategoryPreview();
+    $("#category-form-modal").classList.add("is-open");
+    $("#category-form-modal").setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    setTimeout(() => $("#cf-name").focus(), 150);
+  }
+
+  function closeCategoryForm() {
+    $("#category-form-modal").classList.remove("is-open");
+    $("#category-form-modal").setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    editingCategoryId = null;
+    categoryImage = "";
+  }
+
+  function saveCategory(e) {
+    e.preventDefault();
+    const err = $("#cf-error");
+    err.textContent = "";
+    const name = $("#cf-name").value.trim();
+    if (name.length < 2) { err.textContent = "Escribe un nombre de al menos 2 letras."; $("#cf-name").focus(); return; }
+    const dup = catalog.categories.find((c) => c.id !== editingCategoryId && c.name.toLowerCase() === name.toLowerCase());
+    if (dup) { err.textContent = "Ya existe una categoría con ese nombre."; $("#cf-name").focus(); return; }
+
+    const url = $("#cf-image-url").value.trim();
+    const image = (categoryImage || url || "").trim();
+    const data = {
+      id: editingCategoryId || uniqueCategoryId(name),
+      name: name,
+      short: $("#cf-short").value.trim(),
+      desc: $("#cf-desc").value.trim(),
+      image: image
+    };
+
+    const isEdit = !!editingCategoryId;
+    const idx = catalog.categories.findIndex((c) => c.id === editingCategoryId);
+    if (idx >= 0) catalog.categories[idx] = data;
+    else catalog.categories.push(data);
+
+    if (!saveCatalog()) {
+      err.textContent = "No se pudo guardar. Revisa el espacio de este navegador.";
+      return;
+    }
+    closeCategoryForm();
+    renderAll();
+    toast(isEdit ? "Categoría actualizada." : "Categoría creada.");
+  }
+
+  function deleteCategory(id) {
+    const c = catalog.categories.find((x) => x.id === id);
+    if (!c) return;
+    if (catalog.categories.length <= 1) {
+      toast("Debe existir al menos una categoría.");
+      return;
+    }
+    const count = catalog.products.filter((p) => p.category === id).length;
+    const target = catalog.categories.find((x) => x.id !== id);
+    if (count > 0) {
+      if (!confirm('La categoría "' + c.name + '" tiene ' + count + (count === 1 ? " producto." : " productos.") + '\n\nSe moverán a "' + target.name + '". ¿Continuar?')) return;
+      catalog.products.forEach((p) => { if (p.category === id) p.category = target.id; });
+    } else {
+      if (!confirm('¿Eliminar la categoría "' + c.name + '"?\n\nNo tiene productos.')) return;
+    }
+    catalog.categories = catalog.categories.filter((x) => x.id !== id);
+    if (!saveCatalog()) { toast("No se pudo guardar el cambio."); return; }
+    renderAll();
+    toast("Categoría eliminada.");
+  }
+
+  function moveCategory(id, dir) {
+    const i = catalog.categories.findIndex((c) => c.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= catalog.categories.length) return;
+    const tmp = catalog.categories[i];
+    catalog.categories[i] = catalog.categories[j];
+    catalog.categories[j] = tmp;
+    if (!saveCatalog()) { toast("No se pudo guardar el cambio."); return; }
+    renderCategoryList();
+    fillCategoryOptions();
+    toast("Orden actualizado.");
   }
 
   /* ======================================================================
@@ -917,7 +1084,7 @@
         revision: Math.max(Number(data.revision || 0), Date.now()),
         brand: Object.assign({}, BASE.brand, data.brand || {}),
         settings: Object.assign({}, BASE.settings, data.settings || {}),
-        categories: data.categories || clone(BASE.categories),
+        categories: (Array.isArray(data.categories) && data.categories.length) ? data.categories : clone(BASE.categories),
         products: data.products,
         testimonials: data.testimonials || clone(BASE.testimonials || [])
       };
@@ -944,7 +1111,7 @@
       revision: Number(src.revision || 0),
       brand: Object.assign({}, BASE.brand, src.brand || {}),
       settings: Object.assign({}, BASE.settings, src.settings || {}),
-      categories: src.categories || clone(BASE.categories),
+      categories: (Array.isArray(src.categories) && src.categories.length) ? src.categories : clone(BASE.categories),
       products: src.products || [],
       testimonials: src.testimonials || clone(BASE.testimonials || [])
     };
@@ -1007,6 +1174,34 @@
       renderDraftImages();
     });
 
+    // Categorías
+    $("#btn-new-category").addEventListener("click", () => openCategoryForm());
+    $("#categories-tbody").addEventListener("click", (e) => {
+      const up = e.target.closest("[data-cat-up]");
+      if (up) { moveCategory(up.dataset.catUp, -1); return; }
+      const down = e.target.closest("[data-cat-down]");
+      if (down) { moveCategory(down.dataset.catDown, 1); return; }
+      const ed = e.target.closest("[data-cat-edit]");
+      if (ed) { openCategoryForm(ed.dataset.catEdit); return; }
+      const del = e.target.closest("[data-cat-del]");
+      if (del) deleteCategory(del.dataset.catDel);
+    });
+    $("#category-form").addEventListener("submit", saveCategory);
+    $("#cf-pick").addEventListener("click", () => $("#cf-file").click());
+    $("#cf-file").addEventListener("change", async (e) => {
+      const f = e.target.files && e.target.files[0];
+      e.target.value = "";
+      if (!f) return;
+      try {
+        categoryImage = await compressImage(f);
+        $("#cf-image-url").value = "";
+        renderCategoryPreview();
+      } catch (err) {
+        toast("No se pudo procesar la imagen.");
+      }
+    });
+    $("#cf-image-url").addEventListener("input", () => { categoryImage = ""; renderCategoryPreview(); });
+
     // Pedidos
     $("#order-search").addEventListener("input", renderOrders);
     $("#order-status-filter").addEventListener("change", renderOrders);
@@ -1033,11 +1228,11 @@
 
     // Modales
     $$(".modal").forEach((m) => {
-      m.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) { closeProductForm(); closeOrder(); } });
+      m.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) { closeProductForm(); closeCategoryForm(); closeOrder(); } });
     });
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
-      closeProductForm(); closeOrder(); closeSidebar();
+      closeProductForm(); closeCategoryForm(); closeOrder(); closeSidebar();
     });
 
     // Fecha

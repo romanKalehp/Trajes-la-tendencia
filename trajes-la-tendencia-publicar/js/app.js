@@ -42,10 +42,15 @@
   const brand = Object.assign({}, BASE.brand, catalog.brand || {});
   const settings = Object.assign({}, BASE.settings, catalog.settings || {});
   const products = catalog.products || [];
-  const categories = catalog.categories || BASE.categories;
+  const categories = (Array.isArray(catalog.categories) && catalog.categories.length) ? catalog.categories : BASE.categories;
 
   const byId = (id) => products.find((p) => p.id === id);
   const catName = (id) => (categories.find((c) => c.id === id) || {}).name || "Colección";
+  function categoryImageFor(c) {
+    if (c && c.image) return c.image;
+    const p = products.find((x) => x.category === (c && c.id) && (x.images || [])[0]);
+    return p ? p.images[0] : "assets/img/pattern.svg";
+  }
 
   /* ---------- WhatsApp ---------- */
   const waNumber = digits(brand.whatsapp || "50233451029");
@@ -95,18 +100,36 @@
      ====================================================================== */
   function renderCategories() {
     const grid = $("#category-grid");
+    if (!grid) return;
     grid.innerHTML = categories.map((c) => {
       const n = products.filter((p) => p.active !== false && p.category === c.id).length;
       return `
-        <a class="category-card" href="#coleccion" data-filter="${c.id}">
-          <img src="${esc(c.image)}" alt="${esc(c.name)}" loading="lazy">
+        <a class="category-card" href="#coleccion" data-filter="${esc(c.id)}">
+          <img src="${esc(categoryImageFor(c))}" alt="${esc(c.name)}" loading="lazy">
           <span class="category-card__body">
             <h3>${esc(c.name)}</h3>
-            <p>${esc(c.desc || "")} · ${n} piezas</p>
+            <p>${esc(c.desc || c.short || "")} · ${n} ${n === 1 ? "pieza" : "piezas"}</p>
           </span>
           <span class="category-card__arrow"><svg class="ico"><use href="#i-arrow"/></svg></span>
         </a>`;
     }).join("");
+  }
+
+  function renderNav() {
+    const catLinks = categories.map((c) => `<a href="#coleccion" data-filter="${esc(c.id)}">${esc(c.name)}</a>`).join("");
+    const nav = $("#nav-links");
+    if (nav) nav.innerHTML = `<a href="#inicio">Inicio</a>${catLinks}<a href="#historia">Nosotros</a><a href="#visitanos">Contacto</a>`;
+    const mobile = $("#mobile-nav-links");
+    if (mobile) mobile.innerHTML = `<a href="#inicio">Inicio</a>${catLinks}<a href="#historia">Nosotros</a><a href="#visitanos">Contacto</a>`;
+    const filters = $("#filters");
+    if (filters) {
+      filters.innerHTML = `<button class="filter is-active" data-filter="all" role="tab" aria-selected="true">Todo</button>` +
+        categories.map((c) => `<button class="filter" data-filter="${esc(c.id)}" role="tab" aria-selected="false">${esc(c.name)}</button>`).join("");
+    }
+    const footer = $("#footer-cat-links");
+    if (footer) {
+      footer.innerHTML = `<h3>Tienda</h3>` + catLinks + `<a href="#coleccion" data-filter="all">Ver todo</a>`;
+    }
   }
 
   function badgeFor(p) {
@@ -166,6 +189,7 @@
   }
 
   function setFilter(filter) {
+    if (filter !== "all" && !categories.some((c) => c.id === filter)) filter = "all";
     activeFilter = filter;
     $$("#filters .filter").forEach((b) => {
       const on = b.dataset.filter === filter;
@@ -952,6 +976,7 @@
   }
 
   function init() {
+    renderNav();
     fillDepartments();
     renderCategories();
     renderFeatured();
