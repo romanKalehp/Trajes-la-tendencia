@@ -116,5 +116,91 @@ window.LTCloud = (function () {
     return res.json().catch(() => ({}));
   }
 
-  return { ready: ready, load: load, version: version, save: save, changePassword: changePassword };
+  /* ---------- Pedidos ---------- */
+
+  // La tienda registra el pedido. No necesita clave.
+  async function saveOrder(order) {
+    if (!ready()) throw new Error("La nube no está configurada.");
+    const c = cfg();
+    const url = base() + "/rest/v1/rpc/save_order";
+    const res = await request(url, {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, headers()),
+      body: JSON.stringify({ p_order: order })
+    }, (c.timeout || 3500) * 3);
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try {
+        const body = await res.json();
+        if (body && (body.message || body.error)) msg = body.message || body.error;
+      } catch (e) { /* respuesta sin JSON */ }
+      throw new Error(msg);
+    }
+    return res.json().catch(() => ({}));
+  }
+
+  // El panel lee los pedidos con la clave maestra.
+  async function listOrders(password) {
+    if (!ready()) throw new Error("La nube no está configurada.");
+    const c = cfg();
+    const url = base() + "/rest/v1/rpc/list_orders";
+    const res = await request(url, {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, headers()),
+      body: JSON.stringify({ p_password: password || "" })
+    }, (c.timeout || 3500) * 3);
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try {
+        const body = await res.json();
+        if (body && (body.message || body.error)) msg = body.message || body.error;
+      } catch (e) { /* respuesta sin JSON */ }
+      throw new Error(msg);
+    }
+    return res.json().catch(() => []);
+  }
+
+  // El panel cambia el estado de un pedido.
+  async function setOrderStatus(password, code, status) {
+    if (!ready()) throw new Error("La nube no está configurada.");
+    const c = cfg();
+    const url = base() + "/rest/v1/rpc/set_order_status";
+    const res = await request(url, {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, headers()),
+      body: JSON.stringify({ p_password: password || "", p_code: code || "", p_status: status || "" })
+    }, (c.timeout || 3500) * 3);
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try {
+        const body = await res.json();
+        if (body && (body.message || body.error)) msg = body.message || body.error;
+      } catch (e) { /* respuesta sin JSON */ }
+      throw new Error(msg);
+    }
+    return res.json().catch(() => ({}));
+  }
+
+  // El panel elimina pedidos (borrar historial).
+  async function deleteOrders(password, codes) {
+    if (!ready()) throw new Error("La nube no está configurada.");
+    const c = cfg();
+    const url = base() + "/rest/v1/rpc/delete_orders";
+    const res = await request(url, {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, headers()),
+      body: JSON.stringify({ p_password: password || "", p_codes: codes || [] })
+    }, (c.timeout || 3500) * 3);
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try {
+        const body = await res.json();
+        if (body && (body.message || body.error)) msg = body.message || body.error;
+      } catch (e) { /* respuesta sin JSON */ }
+      throw new Error(msg);
+    }
+    return res.json().catch(() => ({}));
+  }
+
+  return { ready: ready, load: load, version: version, save: save, changePassword: changePassword, saveOrder: saveOrder, listOrders: listOrders, setOrderStatus: setOrderStatus, deleteOrders: deleteOrders };
 })();

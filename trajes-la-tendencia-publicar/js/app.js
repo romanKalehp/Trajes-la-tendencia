@@ -668,8 +668,45 @@
     return ok;
   }
 
+  /* ---------- Pedidos en la nube ---------- */
+  function markOrderCloud(code) {
+    const orders = store.get(KEYS.orders, []);
+    const o = orders.find((x) => x.code === code);
+    if (o && !o.cloud) {
+      o.cloud = 1;
+      store.set(KEYS.orders, orders);
+    }
+  }
+
+  async function uploadOrder(o) {
+    if (!window.LTCloud || !window.LTCloud.ready()) return false;
+    try {
+      await window.LTCloud.saveOrder(o);
+      markOrderCloud(o.code);
+      return true;
+    } catch (err) {
+      console.warn("No se pudo registrar el pedido en la nube:", err && err.message);
+      return false;
+    }
+  }
+
+  // Reintenta pedidos que quedaron sin sincronizar (corte de internet, etc.).
+  function retryPendingOrders() {
+    if (!window.LTCloud || !window.LTCloud.ready()) return;
+    const orders = store.get(KEYS.orders, []);
+    let pending = false;
+    for (const o of orders) if (!o.cloud) { pending = true; break; }
+    if (!pending) return;
+    const retry = async () => {
+      const list = store.get(KEYS.orders, []).filter((o) => !o.cloud);
+      for (const o of list) await uploadOrder(o);
+    };
+    setTimeout(retry, 2500);
+  }
+
   function finalizeOrder(o) {
     saveOrder(o);
+    uploadOrder(o);
     cart = [];
     saveCart();
     renderCart();
@@ -991,6 +1028,7 @@
 
     // Guarda una copia local del catálogo vigente.
     if (!useSaved) store.set(KEYS.catalog, clone(BASE));
+    retryPendingOrders();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

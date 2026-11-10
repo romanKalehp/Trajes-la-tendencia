@@ -137,6 +137,44 @@
     try { localStorage.setItem(KEYS.orders, JSON.stringify(list)); return true; } catch (e) { return false; }
   }
 
+  /* ---------- Pedidos en la nube ---------- */
+  let cloudOrders = [];
+  let cloudOrdersError = "";
+  let cloudOrdersTimer = null;
+
+  async function refreshCloudOrders() {
+    const pass = session.getPass();
+    if (!window.LTCloud || !window.LTCloud.ready() || !pass) return;
+    try {
+      const rows = await window.LTCloud.listOrders(pass);
+      cloudOrders = (Array.isArray(rows) ? rows : []).map((r) => {
+        const o = Object.assign({}, r.data || {});
+        o.code = o.code || r.code;
+        o.cloud = 1;
+        return o;
+      });
+      cloudOrdersError = "";
+    } catch (err) {
+      cloudOrdersError = (err && err.message) || "Error";
+    }
+    renderOrders();
+    renderDashboard();
+    updateCounts();
+  }
+
+  function allOrders() {
+    // La nube manda; los que aún no suben se muestran igual, marcados como locales.
+    const map = new Map();
+    cloudOrders.forEach((o) => map.set(String(o.code), o));
+    getOrders().forEach((o) => { if (!map.has(String(o.code))) map.set(String(o.code), Object.assign({}, o)); });
+    return Array.from(map.values()).sort((a, b) => new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0));
+  }
+
+  function startCloudOrdersPolling() {
+    clearInterval(cloudOrdersTimer);
+    cloudOrdersTimer = setInterval(refreshCloudOrders, 45000);
+  }
+
   /* ---------- Toasts ---------- */
   let toastTimer = null;
   function toast(msg) {
@@ -213,8 +251,14 @@
     $("#admin-app").hidden = false;
     document.body.style.background = "#F7F1EC";
     renderAll();
-    const pending = getOrders().filter((o) => o.status === "pendiente").length;
-    if (pending) toast("Tienes " + pending + (pending === 1 ? " pedido pendiente." : " pedidos pendientes."));
+    if (window.LTCloud && window.LTCloud.ready()) {
+      refreshCloudOrders();
+      startCloudOrdersPolling();
+    }
+    setTimeout(() => {
+      const pending = allOrders().filter((o) => o.status === "pendiente").length;
+      if (pending) toast("Tienes " + pending + (pending === 1 ? " pedido pendiente." : " pedidos pendientes."));
+    }, 900);
   }
 
   function showLogin() {
@@ -249,7 +293,7 @@
     if (name === "dashboard") renderDashboard();
     if (name === "products") renderProducts();
     if (name === "categories") renderCategoryList();
-    if (name === "orders") renderOrders();
+    if (name === "orders") { renderOrders(); refreshCloudOrders(); }
     if (name === "settings") fillSettings();
     closeSidebar();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -279,7 +323,7 @@
 
   function updateCounts() {
     const active = catalog.products.filter((p) => p.active !== false).length;
-    const pending = getOrders().filter((o) => o.status === "pendiente" || o.status === "preparando").length;
+    const pending = allOrders().filter((o) => o.status === "pendiente" || o.status === "preparando").length;
     const sp = $("#side-count-products"), so = $("#side-count-orders");
     if (sp) sp.textContent = String(active);
     if (so) { so.textContent = String(pending); so.style.display = pending ? "" : "none"; }
@@ -305,7 +349,7 @@
      DASHBOARD
      ====================================================================== */
   function renderDashboard() {
-    const orders = getOrders();
+    const orders = allOrders();
     const active = catalog.products.filter((p) => p.active !== false);
     const paidStatuses = ["pagado", "preparando", "enviado", "entregado"];
     const revenue = orders.filter((o) => paidStatuses.includes(o.status)).reduce((n, o) => n + Number(o.total || 0), 0);
@@ -748,18 +792,19 @@
   function renderOrders() {
     const q = ($("#order-search").value || "").trim().toLowerCase();
     const status = $("#order-status-filter").value || "all";
-    let orders = getOrders();
+    let orders = allOrders();
     if (q) orders = orders.filter((o) => (o.code + " " + (o.customer && o.customer.name) + " " + (o.customer && o.customer.phone)).toLowerCase().includes(q));
     if (status !== "all") orders = orders.filter((o) => o.status === status);
 
     $("#orders-list").innerHTML = orders.map((o) => {
       const c = o.customer || {};
       const pieces = (o.items || []).reduce((n, i) => n + Number(i.qty || 0), 0);
+      const src = o.cloud ? "" : ' <span class="pill pill--local">Local</span>';
       return `
         <article class="order-card">
           <div class="order-card__head">
-            <div><strong>${esc(o.code)}</strong><span>${new Date(o.date).toLocaleString("es-GT", { dateStyle: "medium", timeStyle: "short" })}</span></div>
-            <span class="pill pill--${esc(o.status || "pendiente")}">${esc(STATUS[o.status] || "Pendiente")}</span>
+            <div><strong>${esc(o.code)}</strong><span>${new Date(o.date || Date.now()).toLocaleString("es-GT", { dateStyle: "medium", timeStyle: "short" })}</span></div>
+            <span class="pill pill--${esc(o.status || "pendiente")}">${esc(STATUS[o.status] || "Pendiente")}${src}</span>
           </div>
           <div class="order-card__body">
             <div><span>Cliente</span><strong>${esc(c.name || "Cliente")}</strong><small>${esc(c.phone || "")}</small></div>
@@ -774,11 +819,17 @@
     }).join("");
 
     $("#orders-empty").hidden = orders.length > 0;
+    const note = $("#orders-cloud-note");
+    if (note) {
+      if (cloudOrdersError) note.textContent = "No se pudo leer la nube (" + cloudOrdersError + "). " + cloudOrders.length + " pedido(s) visibles desde la copia local.";
+      else if (window.LTCloud && window.LTCloud.ready()) note.textContent = "Nube conectada · " + cloudOrders.length + " pedido(s) en la nube · actualizado a las " + new Date().toLocaleTimeString("es-GT", { timeStyle: "short" });
+      else note.textContent = "Sin nube: solo se muestran los pedidos guardados en este navegador.";
+    }
     updateCounts();
   }
 
   function openOrder(code) {
-    const o = getOrders().find((x) => x.code === code);
+    const o = allOrders().find((x) => x.code === code);
     if (!o) return;
     currentOrderCode = code;
     const c = o.customer || {};
@@ -857,15 +908,29 @@
   function updateOrderStatus() {
     if (!currentOrderCode) return;
     const status = $("#order-status-select").value;
+    const code = currentOrderCode;
+
+    // Local (si existe allí)
     const list = getOrders();
-    const o = list.find((x) => x.code === currentOrderCode);
-    if (!o) return;
-    o.status = status;
-    saveOrders(list);
+    const local = list.find((x) => x.code === code);
+    if (local) {
+      local.status = status;
+      saveOrders(list);
+    }
+
+    // Nube
+    const cloud = cloudOrders.find((x) => x.code === code);
+    if (cloud) cloud.status = status;
+    if (window.LTCloud && window.LTCloud.ready() && session.getPass()) {
+      window.LTCloud.setOrderStatus(session.getPass(), code, status)
+        .then(() => { toast("Estado actualizado a " + STATUS[status] + " (nube)."); })
+        .catch((err) => { toast("El estado se guardó aquí, pero no en la nube: " + (err && err.message)); });
+    }
+
     renderOrders();
     renderDashboard();
-    $("#order-modal-title").textContent = currentOrderCode;
-    toast("Estado actualizado a " + STATUS[status] + ".");
+    $("#order-modal-title").textContent = code;
+    if (!cloud) toast("Estado actualizado a " + STATUS[status] + ".");
     closeOrder();
   }
 
@@ -1118,7 +1183,15 @@
   }
 
   function clearOrders() {
-    if (!confirm("Se borrará todo el historial de pedidos de este navegador.\n\n¿Continuar?")) return;
+    const codes = allOrders().map((o) => o.code);
+    if (!codes.length) { toast("No hay pedidos guardados."); return; }
+    if (!confirm("Se borrarán " + codes.length + " pedidos" + (window.LTCloud && window.LTCloud.ready() ? " de la nube y de este navegador" : "") + ".\n\n¿Continuar?")) return;
+    if (window.LTCloud && window.LTCloud.ready() && session.getPass()) {
+      window.LTCloud.deleteOrders(session.getPass(), codes).catch((err) => {
+        toast("No se pudieron borrar de la nube: " + (err && err.message));
+      });
+    }
+    cloudOrders = [];
     try { localStorage.removeItem(KEYS.orders); } catch (e) {}
     renderOrders();
     renderDashboard();
@@ -1203,6 +1276,11 @@
     $("#cf-image-url").addEventListener("input", () => { categoryImage = ""; renderCategoryPreview(); });
 
     // Pedidos
+    $("#btn-orders-refresh").addEventListener("click", () => {
+      if (!(window.LTCloud && window.LTCloud.ready())) { toast("La nube no está configurada."); return; }
+      toast("Buscando pedidos nuevos…");
+      refreshCloudOrders();
+    });
     $("#order-search").addEventListener("input", renderOrders);
     $("#order-status-filter").addEventListener("change", renderOrders);
     $("#orders-list").addEventListener("click", (e) => {
