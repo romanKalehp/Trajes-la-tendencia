@@ -313,7 +313,7 @@
       <section class="view" data-view="orders">
         <div class="notice notice--info">
           <svg class="ico"><use href="#a-wa"/></svg>
-          <p><strong>Tu libro de pedidos es WhatsApp.</strong> Cada pedido nuevo llega a tu WhatsApp con todos los datos. Esta lista guarda únicamente los pedidos hechos desde este navegador (por ejemplo, ventas registradas en el taller).</p>
+          <p><strong>Tu libro de pedidos es WhatsApp.</strong> Cada pedido nuevo llega a tu WhatsApp con todos los datos. Esta lista también recoge los pedidos de la tienda web desde cualquier dispositivo (se guardan en la nube). Usa <b>Actualizar</b> para ver los últimos.</p>
         </div>
         <div class="toolbar">
           <div class="search-box">
@@ -321,6 +321,9 @@
             <input type="search" id="order-search" placeholder="Buscar por código, cliente o teléfono…" aria-label="Buscar pedido">
           </div>
           <div class="toolbar__group">
+            <button class="btn btn--ghost btn--sm" id="btn-orders-refresh" title="Buscar pedidos nuevos">
+              <svg class="ico"><use href="#a-refresh"/></svg> Actualizar
+            </button>
             <select id="order-status-filter" aria-label="Filtrar por estado">
               <option value="all">Todos los estados</option>
               <option value="pendiente">Pendientes</option>
@@ -333,11 +336,12 @@
           </div>
         </div>
 
+        <p class="table-note" id="orders-cloud-note"></p>
         <div class="orders" id="orders-list"></div>
         <div class="empty-state empty-state--box" id="orders-empty" hidden>
           <svg class="ico"><use href="#a-receipt"/></svg>
-          <p>No hay pedidos guardados en este navegador.</p>
-          <small>Los pedidos de tus clientes llegan directamente a tu WhatsApp. Aquí solo se guardan los que se hacen desde este mismo dispositivo.</small>
+          <p>Aún no hay pedidos.</p>
+          <small>Cuando un cliente confirme un pedido en la tienda web, aparecerá aquí automáticamente y también en tu WhatsApp.</small>
         </div>
       </section>
 
