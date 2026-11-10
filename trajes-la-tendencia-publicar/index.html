@@ -74,11 +74,9 @@
       </span>
     </a>
 
-    <nav class="nav" aria-label="Navegación principal">
+    <nav class="nav" id="nav-links" aria-label="Navegación principal">
       <a href="#inicio">Inicio</a>
-      <a href="#coleccion" data-filter="trajes">Trajes</a>
-      <a href="#coleccion" data-filter="blusas">Blusas</a>
-      <a href="#coleccion" data-filter="cortes">Cortes típicos</a>
+      <a href="#coleccion">Colección</a>
       <a href="#historia">Nosotros</a>
       <a href="#visitanos">Contacto</a>
     </nav>
@@ -106,11 +104,9 @@
       <svg class="ico"><use href="#i-close"/></svg>
     </button>
   </div>
-  <nav class="mobile-nav__links" aria-label="Menú móvil">
+  <nav class="mobile-nav__links" id="mobile-nav-links" aria-label="Menú móvil">
     <a href="#inicio">Inicio</a>
-    <a href="#coleccion" data-filter="trajes">Trajes</a>
-    <a href="#coleccion" data-filter="blusas">Blusas</a>
-    <a href="#coleccion" data-filter="cortes">Cortes típicos</a>
+    <a href="#coleccion">Colección</a>
     <a href="#historia">Nosotros</a>
     <a href="#visitanos">Contacto</a>
   </nav>
@@ -254,9 +250,6 @@
       <div class="shop-toolbar reveal">
         <div class="filters" id="filters" role="tablist" aria-label="Filtrar por categoría">
           <button class="filter is-active" data-filter="all" role="tab" aria-selected="true">Todo</button>
-          <button class="filter" data-filter="trajes" role="tab" aria-selected="false">Trajes</button>
-          <button class="filter" data-filter="blusas" role="tab" aria-selected="false">Blusas</button>
-          <button class="filter" data-filter="cortes" role="tab" aria-selected="false">Cortes típicos</button>
         </div>
         <div class="toolbar__right">
           <span class="result-count" id="product-count">11 piezas</span>
@@ -401,12 +394,9 @@
       </div>
     </div>
 
-    <div class="footer__col">
+    <div class="footer__col" id="footer-cat-links">
       <h3>Tienda</h3>
-      <a href="#coleccion" data-filter="trajes">Trajes</a>
-      <a href="#coleccion" data-filter="blusas">Blusas</a>
-      <a href="#coleccion" data-filter="cortes">Cortes típicos</a>
-      <a href="#coleccion">Ver todo</a>
+      <a href="#coleccion" data-filter="all">Ver todo</a>
     </div>
 
     <div class="footer__col">
