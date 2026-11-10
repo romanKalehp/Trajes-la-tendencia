@@ -103,6 +103,13 @@ Muestra productos activos, pedidos guardados en ese navegador, ingresos confirma
 - **Visible / oculto** y **destacado** se controlan con las casillas del formulario.
 - Si el navegador se queda sin espacio, reduce la cantidad o el tamaño de las fotos.
 
+### Categorías
+
+- **Nueva categoría**: nombre, descripción corta, texto de la tarjeta e imagen (opcional).
+- Si no subes imagen, la tarjeta usa la primera foto de un producto de esa categoría.
+- **Editar**, **eliminar** y cambiar el **orden** con las flechas. El orden se refleja en el menú, los filtros y el pie de la tienda.
+- Si eliminas una categoría con productos, el panel te pide confirmar y los mueve a la primera categoría restante. No se puede borrar la última categoría.
+
 ### Pedidos
 
 - Lista los pedidos **hechos desde este mismo navegador** (por ejemplo, ventas registradas en el taller).
