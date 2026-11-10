@@ -532,3 +532,16 @@ code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.92em;
   .form-grid{grid-template-columns:1fr}
   .image-grid{grid-template-columns:repeat(2,1fr)}
 }
+
+/* ---------- Categorías ---------- */
+.toolbar__intro h2,.view-subhead{font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.1}
+.toolbar__intro p{font-size:10px;color:var(--muted);margin-top:3px}
+.table--categories .cat-desc{max-width:300px;font-size:10.5px;color:var(--muted);line-height:1.5}
+.row-btn--order{font-size:13px;font-weight:700;line-height:1;color:var(--muted)}
+.row-btn--order:hover{color:var(--wine)}
+.row-btn[disabled]{opacity:.35;pointer-events:none}
+.cat-image-row{display:flex;gap:14px;align-items:flex-start}
+.cat-image-preview{width:92px;height:92px;flex:none;border-radius:10px;border:1px dashed var(--line);background:var(--sand);display:grid;place-items:center;overflow:hidden;color:var(--muted);font-size:9px;text-align:center}
+.cat-image-preview img{width:100%;height:100%;object-fit:cover}
+.cat-image-actions{display:flex;flex-direction:column;gap:8px}
+.cat-image-actions .field-note{margin:0;max-width:300px}
